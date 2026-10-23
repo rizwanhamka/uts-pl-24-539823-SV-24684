@@ -4,47 +4,49 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    private function rules(): array
     {
-        //
+        return [
+            'judul' => ['required', 'string', 'max:255'],
+            'penulis' => ['required', 'string', 'max:255'],
+            'tahun_terbit' => ['required', 'integer', 'between:1900,2100'],
+            'stok' => ['required', 'integer', 'min:0'],
+        ];
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function index(): JsonResponse
     {
-        //
+        return response()->json(['data' => Buku::latest('id')->get()]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Buku $buku)
+    public function show(Buku $buku): JsonResponse
     {
-        //
+        return response()->json(['data' => $buku]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Buku $buku)
+    public function store(Request $request): JsonResponse
     {
-        //
+        $buku = Buku::create($request->validate($this->rules()));
+
+        return response()->json(['message' => 'Buku berhasil ditambahkan.', 'data' => $buku], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Buku $buku)
+    public function update(Request $request, Buku $buku): JsonResponse
     {
-        //
+        $buku->update($request->validate($this->rules()));
+
+        return response()->json(['message' => 'Buku berhasil diubah.', 'data' => $buku]);
+    }
+
+    public function destroy(Buku $buku): JsonResponse
+    {
+        $buku->delete();
+
+        return response()->json(['message' => 'Buku berhasil dihapus.']);
     }
 }
