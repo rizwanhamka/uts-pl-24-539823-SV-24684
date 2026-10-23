@@ -17,8 +17,11 @@ class BukuFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            //
-        ];
+return [
+    'judul' => fake()->sentence(3),
+    'penulis' => fake()->name(),
+    'tahun_terbit' => fake()->numberBetween(1990, 2025),
+    'stok' => fake()->numberBetween(0, 50),
+];
     }
 }
