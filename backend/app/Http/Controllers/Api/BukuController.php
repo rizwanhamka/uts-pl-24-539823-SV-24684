@@ -33,6 +33,13 @@ class BukuController extends Controller
     {
         $buku = Buku::create($request->validate($this->rules()));
 
+        Log::info('Buku dibuat', [
+            'actor' => Actor::label($request->user()),
+            'action' => 'buku.create',
+            'buku_id' => $buku->id,
+            'stok' => $buku->stok,
+        ]);
+
         return response()->json(['message' => 'Buku berhasil ditambahkan.', 'data' => $buku], 201);
     }
 
@@ -40,12 +47,24 @@ class BukuController extends Controller
     {
         $buku->update($request->validate($this->rules()));
 
+        Log::info('Buku diubah', [
+            'actor' => Actor::label($request->user()),
+            'action' => 'buku.update',
+            'buku_id' => $buku->id,
+            'changed_fields' => array_keys($buku->getChanges()),
+        ]);
+
         return response()->json(['message' => 'Buku berhasil diubah.', 'data' => $buku]);
     }
-
-    public function destroy(Buku $buku): JsonResponse
+    public function destroy(Request $request, Buku $buku): JsonResponse
     {
         $buku->delete();
+
+        Log::info('Buku dihapus', [
+            'actor' => Actor::label($request->user()),
+            'action' => 'buku.delete',
+            'buku_id' => $buku->id,
+        ]);
 
         return response()->json(['message' => 'Buku berhasil dihapus.']);
     }

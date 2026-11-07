@@ -20,8 +20,19 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
+            Log::warning('Login gagal', [
+                'actor' => Actor::label($user),
+                'action' => 'auth.login',
+                'reason' => $user ? 'wrong_password' : 'user_not_found',
+            ]);
+
             return response()->json(['message' => 'Email atau password salah.'], 401);
         }
+
+        Log::info('Login berhasil', [
+            'actor' => Actor::label($user),
+            'action' => 'auth.login',
+        ]);
 
         return response()->json([
             'message' => 'Login berhasil.',
@@ -32,6 +43,11 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
+        Log::info('Logout', [
+            'actor' => Actor::label($request->user()),
+            'action' => 'auth.logout',
+        ]);
+
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logout berhasil.']);
