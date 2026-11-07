@@ -1,5 +1,10 @@
 name: uts-pl
-
+x-logging: &default-logging
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+    
 services:
   db:
     image: mysql:8.4
@@ -19,6 +24,7 @@ services:
       retries: 20
       start_period: 20s
     networks: [appnet]
+    logging: *default-logging
 
   backend:
     build:
@@ -33,7 +39,9 @@ services:
       APP_ENV: production
       APP_DEBUG: "false"
       APP_KEY: ${APP_KEY}
-      LOG_CHANNEL: stderr
+      LOG_CHANNEL: stdout
+      LOG_LEVEL: info
+      CACHE_STORE: file
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
@@ -46,6 +54,13 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     networks: [appnet]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    logging: *default-logging
 
   frontend:
     build:
@@ -61,6 +76,13 @@ services:
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     networks: [appnet]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging: *default-logging
 
 volumes:
   db_data:
