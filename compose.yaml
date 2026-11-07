@@ -1,5 +1,10 @@
 name: uts-pl
-
+x-logging: &default-logging
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+    
 services:
   db:
     image: mysql:8.4
@@ -19,6 +24,7 @@ services:
       retries: 20
       start_period: 20s
     networks: [appnet]
+    logging: *default-logging
 
   backend:
     build:
@@ -54,6 +60,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 40s
+    logging: *default-logging
 
   frontend:
     build:
@@ -75,6 +82,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    logging: *default-logging
 
 volumes:
   db_data:
