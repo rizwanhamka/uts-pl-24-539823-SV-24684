@@ -115,6 +115,7 @@ return [
 
         'stdout' => [
             'driver' => 'monolog',
+            'name' => 'stdout',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
             'handler_with' => [                  // pakai nama kunci yang sama dengan blok stderr di berkasmu

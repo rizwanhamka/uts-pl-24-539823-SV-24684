@@ -8,6 +8,7 @@ use App\Http\Middleware\RequestContext;
 use App\Support\Actor;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\HealthController;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,12 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware(RequestContext::class)->get('/health', HealthController::class);
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(append: [RequestContext::class]);
     })
 
 ->withExceptions(function (Exceptions $exceptions): void {
+    $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $e) {
+        return $request->is('api/*') || $request->expectsJson();
+    });
+
     $exceptions->render(function (ValidationException $e, Request $request) {
         Log::warning('Validasi gagal', [
             'actor' => Actor::label($request->user()),
