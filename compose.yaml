@@ -48,6 +48,12 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     networks: [appnet]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
@@ -63,6 +69,12 @@ services:
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     networks: [appnet]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 volumes:
   db_data:
