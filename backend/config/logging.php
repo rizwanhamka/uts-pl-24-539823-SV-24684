@@ -1,5 +1,5 @@
 <?php
-
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -102,14 +102,25 @@ return [
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
-        'stderr' => [
+        // 'stderr' => [
+        //     'driver' => 'monolog',
+        //     'level' => env('LOG_LEVEL', 'debug'),
+        //     'handler' => StreamHandler::class,
+        //     'handler_with' => [
+        //         'stream' => 'php://stderr',
+        //     ],
+        //     'formatter' => env('LOG_STDERR_FORMATTER'),
+        //     'processors' => [PsrLogMessageProcessor::class],
+        // ],
+
+        'stdout' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
-            'handler_with' => [
-                'stream' => 'php://stderr',
+            'handler_with' => [                  // pakai nama kunci yang sama dengan blok stderr di berkasmu
+                'stream' => 'php://stdout',      // ('with' atau 'handler_with')
             ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'formatter' => JsonFormatter::class, // satu baris JSON per log
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
