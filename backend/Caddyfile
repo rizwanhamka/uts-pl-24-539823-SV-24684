@@ -1,5 +1,10 @@
 {
 	frankenphp
+
+	servers :8000 {
+		name app
+		metrics
+	}
 }
 
 :8000 {
@@ -12,4 +17,10 @@
 	}
 
 	php_server
+}
+
+# Endpoint metrik untuk Prometheus.
+# Port ini TIDAK dipublikasikan ke host, hanya terjangkau di jaringan Docker Compose.
+:9180 {
+	metrics /metrics
 }
