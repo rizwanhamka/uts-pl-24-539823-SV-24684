@@ -1,0 +1,12 @@
+groups:
+  - name: ketersediaan-layanan
+    rules:
+      - alert: LayananMati
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Layanan {{ $labels.job }} tidak merespons"
+          description: "Target {{ $labels.instance }} (job {{ $labels.job }}) gagal di-scrape lebih dari 1 menit."
+          tindakan_pertama: "Jalankan 'docker compose ps' untuk melihat status container, lalu 'docker compose logs --tail 50 {{ $labels.job }}' untuk membaca sebab matinya. Jika container berhenti, nyalakan dengan 'docker compose start {{ $labels.job }}'."
